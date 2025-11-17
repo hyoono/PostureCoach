@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Posture Coach</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .header .subtitle {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card-title {
+            font-size: 1.2em;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #667eea;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-value {
+            font-size: 3em;
+            font-weight: bold;
+            color: #2d3748;
+        }
+
+        .card-label {
+            font-size: 0.9em;
+            color: #718096;
+            margin-top: 5px;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-left: 10px;
+        }
+
+        .status-good {
+            background: #48bb78;
+            box-shadow: 0 0 10px #48bb78;
+        }
+
+        .status-warning {
+            background: #ed8936;
+            box-shadow: 0 0 10px #ed8936;
+        }
+
+        .status-bad {
+            background: #f56565;
+            box-shadow: 0 0 10px #f56565;
+        }
+
+        .status-offline {
+            background: #a0aec0;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            flex: 1;
+            min-width: 120px;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: white;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background: #667eea;
+        }
+
+        .btn-primary:hover {
+            background: #5a67d8;
+            transform: scale(1.05);
+        }
+
+        .btn-success {
+            background: #48bb78;
+        }
+
+        .btn-success:hover {
+            background: #38a169;
+        }
+
+        .btn-warning {
+            background: #ed8936;
+        }
+
+        .btn-warning:hover {
+            background: #dd6b20;
+        }
+
+        .btn-danger {
+            background: #f56565;
+        }
+
+        .btn-danger:hover {
+            background: #e53e3e;
+        }
+
+        .btn:active {
+            transform: scale(0.95);
+        }
+
+        .btn:disabled {
+            background: #cbd5e0;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background: #e2e8f0;
+            border-radius: 15px;
+            overflow: hidden;
+            margin-top: 15px;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .stat-item {
+            padding: 10px;
+            background: #f7fafc;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .stat-label {
+            font-size: 0.85em;
+            color: #718096;
+            margin-top: 5px;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            font-size: 0.95em;
+        }
+
+        .alert-info {
+            background: #bee3f8;
+            color: #2c5282;
+            border-left: 4px solid #3182ce;
+        }
+
+        .alert-warning {
+            background: #feebc8;
+            color: #7c2d12;
+            border-left: 4px solid #ed8936;
+        }
+
+        .footer {
+            text-align: center;
+            color: white;
+            margin-top: 30px;
+            opacity: 0.8;
+            font-size: 0.9em;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8em;
+            }
+
+            .card-value {
+                font-size: 2em;
+            }
+
+            .controls {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🪑 Smart Posture Coach</h1>
+            <div class="subtitle">Real-time Ergonomics Monitoring System</div>
+        </div>
+
+        <div class="dashboard">
+            <!-- Posture Score Card -->
+            <div class="card">
+                <div class="card-title">
+                    📊 Posture Score
+                    <span class="status-indicator" id="scoreIndicator"></span>
+                </div>
+                <div class="card-value" id="postureScore">--</div>
+                <div class="card-label">Current Score (0-100)</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="scoreProgress" style="width: 0%">
+                        <span id="scorePercent">0%</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Distance Card -->
+            <div class="card">
+                <div class="card-title">
+                    📏 Distance
+                    <span class="status-indicator" id="distanceIndicator"></span>
+                </div>
+                <div class="card-value" id="distance">--</div>
+                <div class="card-label">Distance from Screen (cm)</div>
+                <div class="alert alert-info" style="margin-top: 10px;">
+                    Optimal: 50-70 cm
+                </div>
+            </div>
+
+            <!-- System Status Card -->
+            <div class="card">
+                <div class="card-title">
+                    ⚙️ System Status
+                </div>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-value" id="fps">--</div>
+                        <div class="stat-label">FPS</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="uptime">--</div>
+                        <div class="stat-label">Uptime</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">
+                            <span class="status-indicator" id="cameraStatus"></span>
+                        </div>
+                        <div class="stat-label">Camera</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">
+                            <span class="status-indicator" id="arduinoStatus"></span>
+                        </div>
+                        <div class="stat-label">Arduino</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Session Stats Card -->
+            <div class="card">
+                <div class="card-title">📈 Session Statistics</div>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-value" id="goodTime">--</div>
+                        <div class="stat-label">Good Posture (s)</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="badTime">--</div>
+                        <div class="stat-label">Bad Posture (s)</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="alertCount">--</div>
+                        <div class="stat-label">Alerts</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="breakTime">--</div>
+                        <div class="stat-label">Break Time (s)</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Controls Card -->
+            <div class="card">
+                <div class="card-title">🎮 Controls</div>
+                <div class="controls">
+                    <button class="btn btn-success" id="btnBreak">Start Break</button>
+                    <button class="btn btn-warning" id="btnSnooze">Snooze Alerts</button>
+                    <button class="btn btn-danger" id="btnPrivacy">Privacy Mode</button>
+                </div>
+                <div id="controlStatus" class="alert alert-info" style="display: none;">
+                    Status message here
+                </div>
+            </div>
+
+            <!-- Video Stream Card (Future) -->
+            <div class="card">
+                <div class="card-title">📹 Live View</div>
+                <div style="text-align: center; padding: 40px; background: #f7fafc; border-radius: 8px;">
+                    <div style="font-size: 3em; margin-bottom: 10px;">📷</div>
+                    <div style="color: #718096;">Camera stream coming soon...</div>
+                    <div style="color: #a0aec0; font-size: 0.9em; margin-top: 10px;">
+                        Privacy-first design - No recording
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>Smart Posture & Ergonomics Camera Coach</p>
+            <p>Firmware: <span id="firmwareVersion">--</span></p>
+            <p>Built by hyoono • 2025-11-17</p>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
